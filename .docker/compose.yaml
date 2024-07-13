@@ -1,0 +1,37 @@
+name: iot-backend
+services:
+  node:
+    build: node
+    ports:
+     - "88:88"
+    volumes:
+      - ./../:/usr/app
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASSWORD=admin
+      - DB_NAME=iot
+    depends_on:
+      - mysql
+    networks:
+      - iot-network
+
+  mysql:
+    image: mysql:8.0
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: iot
+    networks:
+      - iot-network
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+networks:
+  iot-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
