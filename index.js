@@ -28,3 +28,9 @@ io.on('connection', (socket) => {
 });
 
 httpServer.listen(process.env.WEBSOCKET_PORT);
+
+const mqtt = require('mqtt');
+const mqttClient = mqtt.connect('http://localhost');
+mqttClient.on('connect', () => {
+	console.log('Conectado a mqtt');
+});
