@@ -1,0 +1,22 @@
+// Listar las ramas de mi repositorio
+git branch
+
+// Actualizar con relación a todos los repositorios remotos
+git fetch --all
+
+// Se utiliza para movernos a la rama que se encuentra en nuestro remoto
+// origin y la rama se llama web-iot-2024
+git checkout origin/web-iot-2024
+
+// Mover/Almacenar nuestros cambios que no estan dentro de un commit
+// a un área donde no cree conflictios con las actualizaciones
+git stash
+
+
+// git checkout -b ... Este comando va a crear la rama "trabajo-clase"
+// y  me movera automaticamente a la misma.
+git checkout -b trabajo-clase
+
+// Bajar del repositorio remoto origin en contenido que se agrego en la rama
+// remota "web-iot-2024" a la rama local en la que me encuentro ubicado
+git pull --rebase origin web-iot-2024 // ejecutarlo siempre desde la rama "trabajo-clase"
