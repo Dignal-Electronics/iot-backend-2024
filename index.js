@@ -13,3 +13,18 @@ app.use(routes);
 app.listen(process.env.API_PORT, () => {
 	console.log(`Puerto API ${process.env.API_PORT}`);
 });
+
+const httpServer = require('http').createServer();
+const io = require('socket.io')(httpServer, {
+	cors: {
+		origin: process.env.URL_ORIGIN
+	}
+});
+
+io.on('connection', (socket) => {
+	socket.on('prueba', () => {
+		console.log('Conectado con el front');
+	});
+});
+
+httpServer.listen(process.env.WEBSOCKET_PORT);

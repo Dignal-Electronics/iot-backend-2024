@@ -3,5 +3,9 @@ node_modules/
 .docker/database
 .docker/package-lock.json
 
+.env
+.env.staginng
+.env.production
+
 package-lock.json
 .DS_store
