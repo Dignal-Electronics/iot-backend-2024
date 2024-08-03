@@ -21,16 +21,38 @@ const io = require('socket.io')(httpServer, {
 	}
 });
 
-io.on('connection', (socket) => {
-	socket.on('prueba', () => {
-		console.log('Conectado con el front');
-	});
-});
-
 httpServer.listen(process.env.WEBSOCKET_PORT);
 
 const mqtt = require('mqtt');
-const mqttClient = mqtt.connect('http://localhost');
+const mqttClient = mqtt.connect('http://emqx');
 mqttClient.on('connect', () => {
 	console.log('Conectado a mqtt');
+});
+mqttClient.subscribe('/dispositivos/+');
+
+const db = require('./models');
+const dispositivo = db.Device;
+const dispositivoDato = db.DeviceData;
+
+io.on('connection', (socket) => {
+	socket.on('inicio', async (data) => {
+		console.log(`Dispositivo ${data} conectado`);
+
+		// Guardo en la constatnte "dispositivoConectado", lo que encuentra en mi base de datos
+		// en la tabla dispositivos.
+		const dispositivoConectado = await dispositivo.findOne({ where: { key: data } });
+
+		if (dispositivoConectado) {
+			console.log('Dispositivo encontrado');
+			//socket.join('dispositivo-1'); -> este dato debe de ser único para la creación del "room".
+			socket.join(`dispositivo-${dispositivoConectado.id}`);
+		}
+	});
+});
+
+// topic = /dispositivos/boxLBpyzd3
+mqttClient.on('message', (topic, message) => {
+	// Obteniendo la clave del dispositivo
+	const claveDispositivo = topic.split('/')[2];
+	console.log(`message: ${claveDispositivo}`);
 });
