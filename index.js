@@ -32,9 +32,9 @@ mqttClient.subscribe('/dispositivos/+');
 
 const db = require('./models');
 const dispositivo = db.Device;
-const dispositivoDato = db.DeviceData;
+const dispositivoDato = db.devices_data;
 
-io.on('connection', (socket) => {
+const socket = io.on('connection', (socket) => {
 	socket.on('inicio', async (data) => {
 		console.log(`Dispositivo ${data} conectado`);
 
@@ -46,13 +46,37 @@ io.on('connection', (socket) => {
 			console.log('Dispositivo encontrado');
 			//socket.join('dispositivo-1'); -> este dato debe de ser único para la creación del "room".
 			socket.join(`dispositivo-${dispositivoConectado.id}`);
+		} else {
+			socket.emit('dispositivo', false);
 		}
 	});
 });
 
 // topic = /dispositivos/boxLBpyzd3
-mqttClient.on('message', (topic, message) => {
+mqttClient.on('message', async (topic, message) => {
 	// Obteniendo la clave del dispositivo
 	const claveDispositivo = topic.split('/')[2];
 	console.log(`message: ${claveDispositivo}`);
+
+	const dispositivoConectado = await dispositivo.findOne({ where: { key: claveDispositivo} });
+	if (dispositivoConectado) {
+		/** 
+		 * El contenido de message
+		 * {
+		 * 	   "temperatura": 35
+		 * }
+		 **/
+
+		const datos = JSON.parse(message.toString());
+
+		const temperatura = datos.temperatura;
+		
+		await dispositivoDato.create({
+			device_id: dispositivoConectado.id,
+			topic: topic,
+			data: message.toString(),
+		});
+		
+		socket.in(`dispositivo-${dispositivoConectado.id}`).emit('temperatura', {date: Date(), value: temperatura});
+	}
 });

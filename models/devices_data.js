@@ -19,7 +19,9 @@ module.exports = (sequelize, DataTypes) => {
     data: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'DeviceData',
+    modelName: 'devices_data',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
   });
   return devices_data;
 };
